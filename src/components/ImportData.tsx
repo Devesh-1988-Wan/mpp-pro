@@ -33,9 +33,16 @@ export function ImportData({ onImport }: ImportDataProps) {
     setIsLoading(true); // Set loading to true
     try {
       const { tasks, headers: fileHeaders } = await parseFile(file);
-      setParsedData(tasks);
-      setHeaders(fileHeaders);
-      setIsMappingDialogOpen(true);
+
+      // Defensive check to ensure headers are a valid array before proceeding
+      if (Array.isArray(fileHeaders) && fileHeaders.length > 0) {
+        setParsedData(tasks);
+        setHeaders(fileHeaders);
+        setIsMappingDialogOpen(true);
+      } else {
+        toast.error('Could not read headers from the file. Please check the file format.');
+        console.error('Parsed headers are not a valid array:', fileHeaders);
+      }
     } catch (error) {
       toast.error('Error parsing file. Please check the file format.');
       console.error(error);
